@@ -1,0 +1,29 @@
+name: Deploy API
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do código
+      uses: actions/checkout@v2
+
+    - name: Instalar Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+
+    - name: Verificar sintaxe do código
+      run: python -m py_compile server.py
+
+    - name: Deploy na Render
+      if: success()
+      run: |
+        curl "$RENDER_DEPLOY_HOOK_URL"
+      env:
+        RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
